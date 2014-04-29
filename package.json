@@ -1,5 +1,5 @@
 {
-  "name": "s3-upload-stream",
+  "name": "s3-stream-upload",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
