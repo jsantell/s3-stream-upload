@@ -1,6 +1,6 @@
 {
   "name": "s3-stream-upload",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -12,7 +12,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "bl": "0.8.0",
     "aws-sdk": "2.0.0-rc13",
     "underscore": "^1.6.0"
   },
