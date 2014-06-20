@@ -1,17 +1,39 @@
 {
   "name": "s3-stream-upload",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "export NODE_ENV=test && ./node_modules/.bin/mocha --reporter spec --ui bdd"
   },
-  "author": "Jordan Santell",
+  "author": {
+    "name": "Jordan Santell",
+    "url": "http://github.com/jsantell"
+  },
   "license": "MIT",
   "dependencies": {
-    "through2": "0.4.1",
     "bl": "0.8.0",
     "xtend": "2.2.0",
     "aws-sdk": "2.0.0-rc13"
-  }
+  },
+  "devDependencies": {
+    "mocha": "1.18.2",
+    "chai": "1.9.1",
+    "buffer-equal": "0.0.1",
+    "when": "^3.2.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/jsantell/s3-stream-upload"
+  },
+  "keywords": [
+    "stream",
+    "upload",
+    "aws",
+    "s3",
+    "amazon"
+  ],
+  "engines": [
+    "node >= 0.10.2"
+  ]
 }
