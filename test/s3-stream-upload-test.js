@@ -92,4 +92,22 @@ describe("s3-stream-upload", function () {
           .then(done, done);
       });
   });
+
+  it("upload 13.2MB (3 part upload), 3 concurrently", function (done) {
+    var filename = FILES["150s_wav"];
+    var key = TEST_PREFIX + filename;
+    utils.getFileStream(filename).pipe(s3upload(utils.createOptions())({ Key: key, concurrent: 3 }))
+      .on("error", done)
+      .on("finish", function () {
+        utils.getObject(key)
+          .then(function (data) {
+            var s3Buffer = data.Body;
+            var fileBuffer = utils.getFileBuffer(filename);
+            expect(s3Buffer.length).to.be.ok;
+            expect(fileBuffer.length).to.be.ok;
+            expect(bufferEqual(s3Buffer, fileBuffer)).to.be.equal(true);
+          })
+          .then(done, done);
+      });
+  });
 });
