@@ -1,6 +1,7 @@
 var fs = require("fs");
 var AWS = require("aws-sdk");
 var when = require("when");
+var ReadableStreamBuffer = require("stream-buffers").ReadableStreamBuffer;
 
 function deleteObject (key) {
   var deferred = when.defer();
@@ -39,12 +40,12 @@ function createOptions () {
 exports.createOptions = createOptions;
 
 function getFileStream (file) {
-  return fs.createReadStream(__dirname + "/" + file);
+  return fs.createReadStream(__dirname + "/integration/" + file);
 }
 exports.getFileStream = getFileStream;
 
 function getFileBuffer (file) {
-  return fs.readFileSync(__dirname + "/" + file);
+  return fs.readFileSync(__dirname + "/integration/" + file);
 }
 exports.getFileBuffer = getFileBuffer;
 
@@ -61,3 +62,20 @@ function getObject (key) {
   return deferred.promise;
 }
 exports.getObject = getObject;
+
+function createBufferStream (n, options) {
+  var stream = new ReadableStreamBuffer({ frequency: 1, chunkSize: 1024 * 64 });
+  var buffer = new Buffer(+n);
+  buffer.fill((Math.random()*100000).toFixed(0));
+  stream.put(buffer);
+  return stream;
+}
+exports.createBufferStream = createBufferStream;
+
+function mockAWSConfig () {
+  return {
+    Bucket: "mr-bucket",
+    Key: "Cloudkicker - Subsume - 02 A weather front was stalled out in the Pacific-like a lonely person, lost in thought, oblivious of time..flac"
+  };
+}
+exports.mockAWSConfig = mockAWSConfig;

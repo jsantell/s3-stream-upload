@@ -3,8 +3,8 @@ var chai = require("chai");
 var when = require("when");
 var expect = chai.expect;
 var bufferEqual = require("buffer-equal");
-var s3upload = require("../");
-var utils = require("./utils");
+var s3upload = require("../../");
+var utils = require("../utils");
 
 var TIMEOUT = 10 * 60 * 1000;
 var TEST_PREFIX = "s3-stream-upload-test/";
@@ -15,7 +15,7 @@ var FILES = {
 //  "1m_wav": "220hz_1m.wav"
 };
 
-describe("s3-stream-upload", function () {
+describe("Integration Test", function () {
   this.timeout(TIMEOUT);
 
   before(function (done) {

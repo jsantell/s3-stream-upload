@@ -41,10 +41,16 @@ fs.readFileStream(__dirname + "/file.mp3")
 
 ## Testing
 
-Right now, a brutal integration test by uploading files. Need to add unit tests and mocks.
+To run unit tests, run:
 
 ```
 npm test
+```
+
+For integration tests on actually uploading to S3, define a few environment variables (`S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, and `S3_BUCKET_NAME`) and run the following:
+
+```
+npm run integration
 ```
 
 ## License
