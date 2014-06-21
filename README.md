@@ -1,4 +1,4 @@
-# s3-stream-upload
+# s3-stream-upload [![Build Status](https://travis-ci.org/jsantell/s3-stream-upload.png)](https://travis-ci.org/jsantell/s3-stream-upload)
 
 A writable stream which uploads to Amazon S3 using the multipart file upload API.
 
