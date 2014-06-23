@@ -1,6 +1,6 @@
 var chai = require("chai");
 var expect = chai.expect;
-var S3 = require("../mocks/s3");
+var S3 = require("../../lib/mock-s3");
 var Uploader = require("../../lib/uploader");
 var mockAWSConfig = require("../utils").mockAWSConfig;
 
@@ -26,7 +26,7 @@ describe("Uploader Unit Tests", function () {
   it("creates the multipart upload on S3 on instantiation", function (done) {
     var client = new S3();
     var config = mockAWSConfig();
-    client.on("createMultipartUpload", done);
+    client.on("mock-s3:call-createMultipartUpload", done);
     var uploader = new Uploader(client, config);
   });
 

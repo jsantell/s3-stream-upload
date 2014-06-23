@@ -53,6 +53,10 @@ For integration tests on actually uploading to S3, define a few environment vari
 npm run integration
 ```
 
+## TODO
+
+Document `mock` features.
+
 ## License
 
 MIT License, Copyright (c) 2014 Jordan Santell
