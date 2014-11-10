@@ -1,6 +1,6 @@
 {
   "name": "s3-stream-upload",
-  "version": "0.0.7",
+  "version": "1.0.0",
   "description": "A writable stream which uploads to Amazon S3 using the multipart file upload API.",
   "main": "index.js",
   "scripts": {

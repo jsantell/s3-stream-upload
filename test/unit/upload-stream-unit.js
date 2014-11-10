@@ -91,4 +91,58 @@ describe("UploadStream Unit Tests", function () {
         done();
       });
   });
+
+  it("has a `bytesWritten` property updated when chunk uploaded", function (done) {
+    var uploader = new MockUploader();
+    var stream = new UploadStream(uploader);
+    var chunksUploaded = [];
+    utils.createBufferStream(1024 * 1024 * 7)
+      .pipe(stream)
+      .on("chunk-uploaded", function (total) {
+        chunksUploaded.push(total);
+        expect(stream.bytesWritten).to.be.equal(total === 1 ? (1024 * 1024 * 5) : (1024 * 1024 * 7));
+      })
+      .on("error", done)
+      .on("finish", function () {
+        expect(chunksUploaded.length).to.be.equal(2);
+        done();
+      });
+  });
+
+  describe("events", function () {
+    it("emits `chunk-uploaded` events on every chunk (1 partial chunk)", function (done) {
+      var uploader = new MockUploader();
+      var stream = new UploadStream(uploader);
+      var chunksUploaded = [];
+      utils.createBufferStream((1024 * 1024) + 500)
+        .pipe(stream)
+        .on("chunk-uploaded", function (total) {
+          chunksUploaded.push(total);
+        })
+        .on("error", done)
+        .on("finish", function () {
+          expect(chunksUploaded.length).to.be.equal(1);
+          expect(chunksUploaded[0]).to.be.equal(1);
+          done();
+        });
+    });
+
+    it("emits `chunk-uploaded` events on every chunk (1 chunks + 1 partial chunk)", function (done) {
+      var uploader = new MockUploader();
+      var stream = new UploadStream(uploader);
+      var chunksUploaded = [];
+      utils.createBufferStream((1024 * 1024 * 7)) // 7MB
+        .pipe(stream)
+        .on("chunk-uploaded", function (total) {
+          chunksUploaded.push(total);
+        })
+        .on("error", done)
+        .on("finish", function () {
+          expect(chunksUploaded.length).to.be.equal(2);
+          expect(chunksUploaded[0]).to.be.equal(1);
+          expect(chunksUploaded[1]).to.be.equal(2);
+          done();
+        });
+    });
+  });
 });
