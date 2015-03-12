@@ -1,20 +1,29 @@
 var chai = require("chai");
 var expect = chai.expect;
 var UploadStream = require("../../lib/upload-stream");
-var MockUploader = require("../mocks/uploader");
+var Uploader = require("../../lib/uploader");
+var MockS3 = require("../../lib/mock-s3");
 var Writable = require("stream").Writable;
 var utils = require("../utils");
+
+function createUploader (ops) {
+  var S3 = new MockS3();
+  ops = ops || {};
+  S3.CREATE_DELAY = ops.CREATE_DELAY || 10;
+  S3.UPLOAD_DELAY = ops.UPLOAD_DELAY || 10;
+  return new Uploader(S3, { Bucket: "mock", Key: "mock" });
+}
 
 describe("UploadStream Unit Tests", function () {
   this.timeout(1000 * 60 * 5);
 
   it("is an instance of Writable", function () {
-    var stream = new UploadStream(new MockUploader());
+    var stream = new UploadStream(createUploader());
     expect(stream).to.be.an.instanceof(Writable);
   });
 
   it("should upload one chunk when < 5MB", function (done) {
-    var uploader = new MockUploader();
+    var uploader = createUploader();
     var stream = new UploadStream(uploader);
     utils.createBufferStream((1024 * 1024) + 500)
       .pipe(stream)
@@ -27,7 +36,7 @@ describe("UploadStream Unit Tests", function () {
   });
 
   it("should upload `SIZE_IN_MB/5MB` chunks when > 5MB", function (done) {
-    var uploader = new MockUploader();
+    var uploader = createUploader();
     var size = 1024 * 1024 * 10;
     var stream = new UploadStream(uploader);
     utils.createBufferStream(size)
@@ -42,7 +51,7 @@ describe("UploadStream Unit Tests", function () {
   });
 
   it("should upload all 5MB chunks, with last chunk being < 5MB", function (done) {
-    var uploader = new MockUploader();
+    var uploader = createUploader();
     var size = 1024 * 1024 * 7;
     var stream = new UploadStream(uploader);
     utils.createBufferStream(size)
@@ -57,7 +66,7 @@ describe("UploadStream Unit Tests", function () {
   });
 
   it("emits an error if underlying uploader emits an error", function (done) {
-    var uploader = new MockUploader();
+    var uploader = createUploader();
     var stream = new UploadStream(uploader);
     utils.createBufferStream((1024 * 1024) + 500)
       .pipe(stream)
@@ -69,31 +78,28 @@ describe("UploadStream Unit Tests", function () {
   });
 
   it("uploads chunks concurrently if set", function (done) {
-    var uploader = new MockUploader();
-    uploader.MOCK_DELAY = 1000;
-    var stream = new UploadStream(uploader, { concurrent: 2 });
+    // Set a very long upload delay to ensure that we'll hit the
+    // concurrent limit before the mock upload completes
+    var uploader = createUploader({ UPLOAD_DELAY: 60000 });
+    var stream = new UploadStream(uploader, { concurrent: 4 });
 
     var count = 0;
-    uploader.on("_uploading", function (pending) {
+    uploader.on("uploading", function (pending) {
       count++;
-      if (count === 1) {
-        expect(pending).to.be.equal(1);
-      } else {
-        expect(pending).to.be.equal(2);
+      if (count === 4) {
+        expect(pending).to.be.equal(4);
+        stream.end();
+        done();
       }
     });
 
     utils.createBufferStream(1024 * 1024 * 20)
       .pipe(stream)
-      .on("error", done)
-      .on("finish", function () {
-        expect(count).to.be.equal(4);
-        done();
-      });
+      .on("error", done);
   });
 
   it("has a `bytesWritten` property updated when chunk uploaded", function (done) {
-    var uploader = new MockUploader();
+    var uploader = createUploader();
     var stream = new UploadStream(uploader);
     var chunksUploaded = [];
     utils.createBufferStream(1024 * 1024 * 7)
@@ -111,7 +117,7 @@ describe("UploadStream Unit Tests", function () {
 
   describe("events", function () {
     it("emits `chunk-uploaded` events on every chunk (1 partial chunk)", function (done) {
-      var uploader = new MockUploader();
+      var uploader = createUploader();
       var stream = new UploadStream(uploader);
       var chunksUploaded = [];
       utils.createBufferStream((1024 * 1024) + 500)
@@ -128,7 +134,7 @@ describe("UploadStream Unit Tests", function () {
     });
 
     it("emits `chunk-uploaded` events on every chunk (1 chunks + 1 partial chunk)", function (done) {
-      var uploader = new MockUploader();
+      var uploader = createUploader();
       var stream = new UploadStream(uploader);
       var chunksUploaded = [];
       utils.createBufferStream((1024 * 1024 * 7)) // 7MB
