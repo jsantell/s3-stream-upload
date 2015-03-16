@@ -1,13 +1,52 @@
 var fs = require("fs");
-var AWS = require("aws-sdk");
 var when = require("when");
 var ReadableStreamBuffer = require("stream-buffers").ReadableStreamBuffer;
+var path = require("path");
 
-function deleteObject (key) {
+/**
+ * Creates a bucket and deletes any files created from the tests.
+ */
+function before (s3, bucket, keys, done) {
+  createBucket(s3, bucket)
+    .then(function () {
+      return when.all(
+        // Swallow deleteObject errors here incase the files don't yet exist
+        keys.map(function (key) { return deleteObject(s3, bucket, key).catch(function () {}); })
+      )
+    }).then(function () { done(); });
+}
+exports.before = before;
+
+/**
+ * Attempts to delete any files created from tests.
+ */
+function after (s3, bucket, keys, done) {
+  when.all(
+    // Swallow deleteObject errors here incase the files don't yet exist
+    keys.map(function (key) { return deleteObject(s3, bucket, key).catch(function() {}); })
+  ).then(function () { done(); });
+}
+exports.after = after;
+
+/**
+ * Used to upload a file to s3/mocks3 and then subsequently pull down for analysis
+ */
+function uploadAndFetch (s3, stream, filename, bucket, key) {
   var deferred = when.defer();
-  var s3 = new AWS.S3(createOptions());
+  exports.getFileStream(filename)
+    .pipe(stream)
+    .on("error", deferred.reject)
+    .on("finish", function () {
+      deferred.resolve(exports.getObject(s3, bucket, key));
+    });
+  return deferred.promise;
+}
+exports.uploadAndFetch = uploadAndFetch;
+
+function deleteObject (s3, bucket, key) {
+  var deferred = when.defer();
   s3.deleteObject({
-    Bucket: createOptions().Bucket,
+    Bucket: bucket,
     Key: key
   }, function (err, data) {
     if (err) deferred.reject(err);
@@ -17,11 +56,10 @@ function deleteObject (key) {
 }
 exports.deleteObject = deleteObject;
 
-function createBucket () {
+function createBucket (s3, bucket) {
   var deferred = when.defer();
-  var s3 = new AWS.S3(createOptions());
   s3.createBucket({
-    Bucket: createOptions().Bucket,
+    Bucket: bucket
   }, function (err, data) {
     if (err) deferred.reject(err);
     else deferred.resolve(data);
@@ -40,20 +78,19 @@ function createOptions () {
 exports.createOptions = createOptions;
 
 function getFileStream (file) {
-  return fs.createReadStream(__dirname + "/integration/" + file);
+  return fs.createReadStream(file);
 }
 exports.getFileStream = getFileStream;
 
 function getFileBuffer (file) {
-  return fs.readFileSync(__dirname + "/integration/" + file);
+  return fs.readFileSync(file);
 }
 exports.getFileBuffer = getFileBuffer;
 
-function getObject (key) {
+function getObject (s3, bucket, key) {
   var deferred = when.defer();
-  var s3 = new AWS.S3(createOptions());
   s3.getObject({
-    Bucket: createOptions().Bucket,
+    Bucket: bucket,
     Key: key
   }, function (err, data) {
     if (err) deferred.reject(err);
@@ -71,11 +108,3 @@ function createBufferStream (n, options) {
   return stream;
 }
 exports.createBufferStream = createBufferStream;
-
-function mockAWSConfig () {
-  return {
-    Bucket: "mr-bucket",
-    Key: "Cloudkicker - Subsume - 02 A weather front was stalled out in the Pacific-like a lonely person, lost in thought, oblivious of time..flac"
-  };
-}
-exports.mockAWSConfig = mockAWSConfig;

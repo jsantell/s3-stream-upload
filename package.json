@@ -1,6 +1,6 @@
 {
   "name": "s3-stream-upload",
-  "version": "1.1.2",
+  "version": "2.0.0",
   "description": "A writable stream which uploads to Amazon S3 using the multipart file upload API.",
   "main": "index.js",
   "scripts": {
@@ -13,16 +13,15 @@
   },
   "license": "MIT",
   "dependencies": {
-    "underscore": "^1.6.0",
-    "aws-sdk": "~2.1.16",
     "buffer-queue": "~1.0.0"
   },
   "devDependencies": {
-    "mocha": "1.18.2",
-    "chai": "1.9.1",
     "buffer-equal": "0.0.1",
+    "chai": "1.9.1",
+    "mocha": "1.18.2",
+    "stream-buffers": "^0.2.5",
     "when": "^3.2.3",
-    "stream-buffers": "^0.2.5"
+    "mock-s3": "~1.0.1"
   },
   "repository": {
     "type": "git",

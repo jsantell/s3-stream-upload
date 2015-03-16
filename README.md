@@ -16,18 +16,14 @@ npm install s3-stream-upload
 ## Usage
 
 ```javascript
-var S3StreamUpload = require("s3-stream-upload");
-
-var uploader = S3StreamUploader({
-  accessKeyId: process.env.S3_ACCESS_KEY_ID,
-  secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
-  Bucket: process.env.S3_BUCKET_NAME
-});
+var UploadStream = require("s3-stream-upload");
+var S3 = require("aws-sdk").S3;
 
 var key = "file.mp3";
+var s3 = new S3();
 
 fs.readFileStream(__dirname + "/file.mp3")
-  .pipe(uploader({ Key: key }))
+  .pipe(UploadStream(s3, { Bucket: "my-bucket", Key: key }))
   .on("error", function (err) {
     console.error(err);
   })
@@ -38,18 +34,13 @@ fs.readFileStream(__dirname + "/file.mp3")
 
 ## API
 
-### `S3StreamUploader(s3Config)`
+### `UploadStream(s3, s3Config, config)`
 
-Takes configuration (same options as [aws-sdk](https://www.npmjs.org/package/aws-sdk)'s [S3 constructor](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/frames.html)) and returns a new stream uploader factory.
 
-### `uploader(config)`
+Creates and returns a [WritableStream](http://nodejs.org/api/stream.html#stream_class_stream_writable) for uploading to S3. Takes an S3 instance, and a `s3Config` object, which takes the same options as [S3.createMultipartUpload](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/frames.html). Additional, non-S3 config options may be set on `config`, listed below:
 
-Creates and returns a WritableStream for uploading to S3. Takes a `config` object, which takes the same options as [S3.createMultipartUpload](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/frames.html), and will use the `Bucket` property of the creation if not specified in `config`. Additional, non-S3 config options may be set, listed below:
   * `concurrent` How many chunks can be sent to S3 concurrently. `1` by default.
 
-### `uploadStream`
-
-Extends [WritableStream](http://nodejs.org/api/stream.html#stream_class_stream_writable).
 
 #### Events
 
@@ -69,15 +60,6 @@ To run unit tests, run:
 npm test
 ```
 
-For integration tests on actually uploading to S3, define a few environment variables (`S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, and `S3_BUCKET_NAME`) and run the following:
-
-```
-npm run integration
-```
-
-## TODO
-
-Document `mock` features.
 
 ## License
 
