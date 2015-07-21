@@ -10,7 +10,7 @@
   "author": {
     "name": "Jordan Santell",
     "url": "http://github.com/jsantell"
-  },
+  },"version": "0.1.5",
   "license": "MIT",
   "dependencies": {
     "aws-sdk": "^2.1.16",
