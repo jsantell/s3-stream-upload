@@ -37,7 +37,7 @@ fs.readFileStream(__dirname + "/file.mp3")
 ### `UploadStream(s3, s3Config, config)`
 
 
-Creates and returns a [WritableStream](http://nodejs.org/api/stream.html#stream_class_stream_writable) for uploading to S3. Takes an S3 instance, and a `s3Config` object, which takes the same options as [S3.createMultipartUpload](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/frames.html). Additional, non-S3 config options may be set on `config`, listed below:
+Creates and returns a [WritableStream](http://nodejs.org/api/stream.html#stream_class_stream_writable) for uploading to S3. Takes an S3 instance, and a `s3Config` object, which takes the same options as [S3.createMultipartUpload](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#createMultipartUpload-property). Additional, non-S3 config options may be set on `config`, listed below:
 
   * `concurrent` How many chunks can be sent to S3 concurrently. `1` by default.
 
