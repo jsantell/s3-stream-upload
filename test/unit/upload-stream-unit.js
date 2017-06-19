@@ -3,7 +3,7 @@ var expect = chai.expect;
 var UploadStream = require("../../lib/upload-stream");
 var Uploader = require("../../lib/uploader");
 var S3 = require("mock-s3").S3;
-var Writable = require("stream").Writable;
+var Writable = require("readable-stream").Writable;
 var utils = require("../utils");
 
 describe("UploadStream Unit Tests", function () {
