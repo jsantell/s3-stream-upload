@@ -13,7 +13,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "buffer-queue": "~1.0.0"
+    "buffer-queue": "~1.0.0",
+    "readable-stream": "^2.3.0"
   },
   "devDependencies": {
     "buffer-equal": "0.0.1",
