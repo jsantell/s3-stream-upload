@@ -16,13 +16,15 @@ npm install s3-stream-upload
 ## Usage
 
 ```javascript
+// index.js
 var UploadStream = require("s3-stream-upload");
 var S3 = require("aws-sdk").S3;
+var fs = require("fs");
 
 var key = "file.mp3";
 var s3 = new S3();
 
-fs.readFileStream(__dirname + "/file.mp3")
+fs.createReadStream(__dirname + "/file.mp3")
   .pipe(UploadStream(s3, { Bucket: "my-bucket", Key: key }))
   .on("error", function (err) {
     console.error(err);
@@ -31,6 +33,10 @@ fs.readFileStream(__dirname + "/file.mp3")
     console.log("File uploaded!");
   });
 ```
+```sh
+$ AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar node index.js
+```
+See [aws-sdk-js](https://github.com/aws/aws-sdk-js) for other ways to configure you environment variables.
 
 ## API
 
